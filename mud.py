@@ -9,7 +9,7 @@ class Director:
         global current
       
         current = Scene(place)
-        print (current.place)
+        print ("这里是" + current.place)
         
     def nextScene(current, result):
   

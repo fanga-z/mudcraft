@@ -1,4 +1,4 @@
-25
+94
 95
 小宝
-home.txt
+hospital.txt
