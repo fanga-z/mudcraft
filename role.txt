@@ -1,4 +1,4 @@
-94
+234
 95
 小宝
-hospital.txt
+yard.txt
