@@ -90,6 +90,9 @@ class Role:
         f.write(self.name + "\n")
         f.write(current.file() + "\n")
         f.close()
+
+        global bag
+        bag.save()
         print ("档案已经保存, 再见")
         time.sleep(0.5)
 
@@ -162,21 +165,74 @@ class Scene:
 class Object:
     def __init__(self, name):
         self.name = name
-        self.hp = random.randint(3,6)
-        self.reward = "武林秘籍"
+        global objectDef;
+        self.hp = objectDef.obj_hp_def(name);
+        self.reward = objectDef.obj_get_def(name);
     def react(self, action, who):
         if action == "punch":
             who.add_exp(random.randint(1,10))
             self.hp -= 1
             if self.hp == 0:
+                global bag
+                bag.add(self.reward, 1)
                 print ("你赢了 得到" + self.reward)
             else:
                 print ("你打了"+self.name + "一下 还得打"+str(self.hp)+"下")
-        
-        
+
+'''
+物品的定义表
+每个物品的名字HP和掉落物品
+'''
+class ObjectDef:
+    def __init__(self):
+        f = open("object_def.txt", "r" , encoding="UTF-8")
+        txt = f.readline().strip()
+        object_hp = {}
+        object_get = {}
+        while not txt == "":
+            opt = txt.split(":")
+            object_hp[opt[0]] = int(opt[1])
+            object_get[opt[0]] = opt[2]
+            txt = f.readline().strip()   
+        self.object_hp = object_hp
+        self.object_get = object_get
+    def obj_hp_def(self, obj_name):
+        if obj_name in self.object_hp.keys():
+            return self.object_hp[obj_name];
+        return 0
+    def obj_get_def(self, obj_name):
+        if obj_name in self.object_get.keys():
+            return self.object_get[obj_name];
+        return ""
+
+import pickle
+
+class Bag:
+    def __init__(self):
+        if Path("bag.pkl").exists():
+            pickle_file = open("bag.pkl", 'br')
+            self.bag = pickle.load(pickle_file)
+            pickle_file.close()
+        else:
+            self.bag = {}    
+    def add(self, obj, num):
+        if obj in self.bag.keys():
+            self.bag[obj] = self.bag[obj] + num
+            if self.bag[obj] <= 0:
+                del self.bag[obj]
+        else:
+            self.bag[obj] = num
+    def save(self):
+        pickle_file = open("bag.pkl", 'bw')
+        pickle.dump(self.bag, pickle_file)
+        pickle_file.close()
+    def view(self):
+        print (self.bag)
+
 current = None
 you = Role()
-
+objectDef = ObjectDef()
+bag = Bag()
 running = True
 while running:
     
@@ -184,6 +240,8 @@ while running:
     action = action.strip()
     if action == "hp":
         print (you.hp)
+    elif action == "bag":
+        bag.view()
     elif action == "exp":
         print (you.exp)
     elif action == "when":
