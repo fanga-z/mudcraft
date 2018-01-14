@@ -1,6 +1,7 @@
-import time, random
+import time, random, weather
 
 from role import Role 
+
 
 you = Role()
 
@@ -12,11 +13,13 @@ while running:
     if action == "hp":
         print (you.hp)
     elif action == "bag":
-        you.bag.view()
+        you.bag.view(you)
     elif action == "exp":
         print (you.exp)
     elif action == "when":
-        print ("[一月]已经是正午了，太阳躲在雾霾的后面，没有一点暖和的意思")  
+        info = weather.get_weather()
+        if info != None:
+            print (info['city'] + " PM2.5 " + str(info['data']['pm25']) + " 空气质量 " + info['data']['quality'] + " 温度 " + str(info['data']['wendu']) )
     elif action == "bye":
         you.bye()
         running = False
